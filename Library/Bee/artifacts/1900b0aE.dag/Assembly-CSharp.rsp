@@ -388,6 +388,7 @@
 "Assets/Mountain Terrain rocks and tree/Script/Camera/CameraControl.cs"
 "Assets/Mountain Terrain rocks and tree/Script/Camera/FlyCameraControl.cs"
 "Assets/Scripts/MenuController.cs"
+"Assets/Scripts/PersonajeController.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01_UGUI.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark02.cs"
