@@ -387,6 +387,7 @@
 -analyzer:"C:/Program Files/Unity 2023.2.20f1/Editor/Data/Tools/Unity.SourceGenerators/Unity.UIToolkit.SourceGenerator.dll"
 "Assets/Mountain Terrain rocks and tree/Script/Camera/CameraControl.cs"
 "Assets/Mountain Terrain rocks and tree/Script/Camera/FlyCameraControl.cs"
+"Assets/Scripts/CameraController.cs"
 "Assets/Scripts/MenuController.cs"
 "Assets/Scripts/PersonajeController.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01.cs"
