@@ -28,8 +28,8 @@ public class CameraController : MonoBehaviour
         {
             transform.position = target.transform.position + v3;
         }
-        camRotation.y += Input.GetAxis("Mouse x") * velocidad;
-        camRotation.x += Input.GetAxis("Mouse y") * velocidad;
+        camRotation.y += Input.GetAxis("Mouse X") * velocidad;
+        camRotation.x += Input.GetAxis("Mouse Y") * velocidad;
 
         camRotation.x = Mathf.Clamp(camRotation.x, minLook, maxLook);
         transform.localRotation = Quaternion.Euler(camRotation.x, camRotation.y, camRotation.z);

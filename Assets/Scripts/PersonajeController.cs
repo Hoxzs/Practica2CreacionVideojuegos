@@ -15,6 +15,12 @@ public class PersonajeController : MonoBehaviour
     public bool inGround;
     private RaycastHit hit;
 
+    //Variables Roll
+    public static bool cooldown;
+    private bool rotando;
+    public float fuerzaRoll;
+    public Vector3 direccionRoll;
+
     void Start()
     {
         
@@ -31,11 +37,21 @@ public class PersonajeController : MonoBehaviour
         {
             inGround = false;
         }
+        gestorInput();
     }
-    void FixedUpdate()
+void FixedUpdate()
     {
-        Movimiento();
-    }
+        if (!cooldown)
+        {
+            Movimiento();
+        }
+
+        if (rotando)
+        {
+            rb.velocity = new Vector3(0, rb.velocity.y, 0);
+            rb.AddForce(direccionRoll * fuerzaRoll, ForceMode.VelocityChange);
+            }
+}
 
     public void Movimiento()
     {
@@ -70,5 +86,27 @@ public class PersonajeController : MonoBehaviour
     {
         Gizmos.color = Color.yellow;
         Gizmos.DrawRay(transform.position + offsetRaycast, Vector3.down * distanciaSuelo);
+    }
+
+    public void gestorInput()
+    {
+       if (!rotando)
+        {
+            if (Input.GetKeyDown(KeyCode.E))
+            {
+                direccionRoll = transform.forward;
+                rotando = true;
+                cooldown = true;
+
+                personajeAnimator.SetBool("correr", false);
+                personajeAnimator.SetTrigger("roll");
+            }
+        }
+    }
+    public void finEstados()
+    {
+        rotando = false;
+        cooldown = false;
+        rb.velocity = new Vector3(0f, rb.velocity.y, 0f);
     }
 }
