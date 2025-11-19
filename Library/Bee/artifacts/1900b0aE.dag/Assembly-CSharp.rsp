@@ -390,6 +390,7 @@
 "Assets/Scripts/CameraController.cs"
 "Assets/Scripts/MenuController.cs"
 "Assets/Scripts/PersonajeController.cs"
+"Assets/Scripts/ProyectilController.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark01_UGUI.cs"
 "Assets/TextMesh Pro/Examples & Extras/Scripts/Benchmark02.cs"
