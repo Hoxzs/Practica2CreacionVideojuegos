@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 7747076561486026802}
   - component: {fileID: 5505600378524265720}
   - component: {fileID: 2806592342130445731}
-  - component: {fileID: 7801384331935314534}
+  - component: {fileID: -2573019868384581313}
   m_Layer: 0
   m_Name: Bolita fuego pintada 01
   m_TagString: Untagged
@@ -99,10 +99,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 03fc82859fe91cb4ea722d7e98b9ab27, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  velocidad: 10
+  velocidad: 15
   distancia: 25
---- !u!65 &7801384331935314534
-BoxCollider:
+--- !u!136 &-2573019868384581313
+CapsuleCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -116,9 +116,11 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1.595794, y: 1.4981842, z: 1.5735532}
-  m_Center: {x: -0.34675106, y: 2.1472178, z: 0.607344}
+  serializedVersion: 2
+  m_Radius: 0.7978969
+  m_Height: 1.4981842
+  m_Direction: 1
+  m_Center: {x: -0.34675103, y: 2.1472178, z: 0.607344}

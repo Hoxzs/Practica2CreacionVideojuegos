@@ -26,6 +26,9 @@ public class PersonajeController : MonoBehaviour
     //Lanzar Poder
     public GameObject proyectil;
     public GameObject posProyectil;
+    //salud del jugador
+    public float salud = 100f;  // Salud del jugador
+
     void Update()
     {
        if (Physics.Raycast(transform.position, Vector3.down, out hit, distanciaSuelo))
@@ -175,5 +178,22 @@ public class PersonajeController : MonoBehaviour
     {
         GameObject instancia = Instantiate(proyectil, posProyectil.transform.position,
                                             transform.rotation);
+    }
+    public void TomarDaño(float cantidad)
+    {
+        salud -= cantidad;  // Reducir la salud del jugador
+
+        if (salud <= 0)
+        {
+            MuerteJugador();  // Si la salud llega a 0 o menos, el jugador muere
+        }
+    }
+    void MuerteJugador()
+    {
+        // Aquí puedes agregar la lógica para la muerte del jugador, como mostrar una pantalla de Game Over
+        Debug.Log("¡El jugador ha muerto!");
+        // Por ejemplo, puedes desactivar el jugador o cambiar la escena:
+        // gameObject.SetActive(false);
+        // o cargar una escena de Game Over
     }
 }

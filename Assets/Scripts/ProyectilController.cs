@@ -4,43 +4,53 @@ using UnityEngine;
 
 public class ProyectilController : MonoBehaviour
 {
-    public float velocidad;
-    private Transform jugador;
-    private GameObject jugadorObj;
-    public float distancia;
+    public float velocidad = 10f;
+    public float distancia = 20f;
+    public int daño = 1; // Daño del proyectil
 
-    // Start is called before the first frame update
+    private Transform jugador;
+
     void Start()
     {
-        jugadorObj = GameObject.Find("Personaje");
-        jugador = jugadorObj.GetComponent<Transform>();
+        jugador = GameObject.Find("Personaje").transform;
     }
 
-    // Update is called once per frame
     void Update()
     {
-        movimiento();
-        destuir();
+        Movimiento();
+        DestruirPorDistancia();
     }
 
-    public void movimiento()
+    void Movimiento()
     {
         transform.Translate(Vector3.forward * velocidad * Time.deltaTime);
     }
 
-    public void destuir()
+    void DestruirPorDistancia()
     {
-        if (Vector3.Distance(jugador.transform.position, transform.position) > distancia)
+        if (Vector3.Distance(jugador.position, transform.position) > distancia)
+        {
             Destroy(gameObject);
+        }
     }
 
-    public void OnTriggerEnter(Collider other)
+    private void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.CompareTag("Enemigo"))
+        if (other.CompareTag("Enemigo"))
         {
-            Destroy(other.gameObject);
-            Destroy(gameObject);
+            // Detectar el script Enemigo en el objeto o en sus padres
+            Enemigo enemigo = other.GetComponentInParent<Enemigo>();
 
+            if (enemigo != null)
+            {
+                enemigo.TakeDamage(daño);
+            }
+            else
+            {
+                Debug.LogWarning("Proyectil tocó un objeto con TAG 'Enemigo', pero no tiene script Enemigo en el mismo objeto ni en sus padres.");
+            }
+
+            Destroy(gameObject); // destruir solo el proyectil
         }
     }
 }
