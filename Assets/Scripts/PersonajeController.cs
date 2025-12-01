@@ -196,4 +196,20 @@ public class PersonajeController : MonoBehaviour
         // gameObject.SetActive(false);
         // o cargar una escena de Game Over
     }
+    public void TomarDaño(int cantidad)
+{
+    // 1. Restamos la vida en el marcador global
+    GameController.vidas -= cantidad;
+    
+    // 2. (Opcional) Mensaje en consola para verificar
+    Debug.Log("¡Auch! Me golpearon. Vidas restantes: " + GameController.vidas);
+
+    // 3. Verificamos si morimos (aunque GameController ya lo hace, es bueno tenerlo aquí para animaciones)
+    if (GameController.vidas <= 0)
+    {
+        // Aquí podrías poner tu animación de muerte del personaje
+        // GetComponent<Animator>().SetTrigger("Muerte");
+        Debug.Log("El personaje ha muerto.");
+    }
+}
 }

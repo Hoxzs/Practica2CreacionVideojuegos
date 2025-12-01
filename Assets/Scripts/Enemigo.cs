@@ -4,229 +4,139 @@ using UnityEngine;
 
 public class Enemigo : MonoBehaviour
 {
-    // Variables para rutina
-    private int rutina;
-    private float cronometro;
+    // --- VARIABLE ESTÁTICA ---
+    // (La mantenemos para que tu script RangoEnemigo no de error, 
+    // aunque la lógica principal ahora la maneja este script por distancia)
+    public static bool atacando; 
+
+    // --- REFERENCIAS ---
     private Animator aniEnemigo;
-    public float velWalk;
-    public float velRun;
-
-    // Variables para la detección del jugador
-    public LayerMask capaDelJugador;
-    private bool estarAlerta;
-    public float rangoDeAlerta;
-    private bool atacar;
-    public float rangoAtaque;
     private Transform jugador;
-
-    // VFX
-    public GameObject efectoVFX;  // Efecto de explosión asignado
-
-    // SFX
-    private AudioSource fuente;
-    public AudioClip clipDie;  // Este sonido ya no lo usaremos, pero lo dejamos para referencia
-
-    public static bool atacando;
-
-    public GameObject rango;
-
     private Rigidbody rb;
+    public GameObject efectoVFX;
 
-    // Salud del enemigo
-    public int vidas;
-
-    // Variables necesarias para el enemigo
-    public float dañoAlJugador = 10f; // Daño que el enemigo inflige al jugador
-    public float tiempoEntreAtaques = 1f; // Tiempo entre ataques para evitar ataques continuos
-
-    private float cronometroAtaque = 0f;  // Cronómetro para controlar los ataques
+    // --- CONFIGURACIÓN ---
+    public int vidas = 3;
+    public float rangoDeAlerta = 15f;
+    public float rangoAtaque = 2.5f; // Distancia para empezar a golpear
+    public float velRun = 4f;
+    
+    // --- DAÑO ---
+    public int dañoAlJugador = 10;
+    
+    // Control de tiempo para el daño (Cooldown)
+    private float ultimoAtaqueTime = 0;
+    public float cooldownAtaque = 1.0f; // Tiempo mínimo entre daños
 
     void Start()
     {
-        fuente = GameObject.Find("SFX").GetComponent<AudioSource>();
         aniEnemigo = GetComponent<Animator>();
-        jugador = GameObject.Find("Personaje").transform;
         rb = GetComponent<Rigidbody>();
+        
+        // Buscar al jugador de forma segura
+        GameObject playerObj = GameObject.Find("Personaje");
+        if (playerObj != null) 
+            jugador = playerObj.transform;
+
+        // Registrar este enemigo en el conteo de la fábrica
+        GameController.enemigosVivosActualmente++;
     }
 
     void Update()
     {
-        ComportamientoEnemigo();
-        cronometroAtaque += Time.deltaTime;
-    }
+        // Si no hay jugador, no hacemos nada
+        if (jugador == null) return;
+        
+        float distancia = Vector3.Distance(transform.position, jugador.position);
 
-    void FixedUpdate()
-    {
-        MovimientoFisico();
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.gameObject.tag.Contains("Proyectil"))
+        // --- LÓGICA DE PERSECUCIÓN ---
+        if (distancia < rangoDeAlerta)
         {
-            TakeDamage(1); // Llamar a TakeDamage con el valor del daño
-            Destroy(other.gameObject); // Destruir el proyectil
-        }
-    }
+            // Girar para mirar al jugador
+            Vector3 targetPostition = new Vector3(jugador.position.x, transform.position.y, jugador.position.z);
+            transform.LookAt(targetPostition);
 
-    // Método para reducir la vida del enemigo
-// Método para reducir la vida del enemigo
-public void TakeDamage(int damage)
-{
-    // Reducir las vidas primero
-    vidas -= damage;
-
-    // Mostrar el mensaje de vida restante después de restar el daño
-    Debug.Log("Enemigo ha recibido daño. Vida restante: " + vidas);
-
-    // Verificar si el enemigo ha muerto
-    if (vidas <= 0)
-    {
-        Debug.Log("Enemigo muerto");
-        Die(); // Llamar a Die para destruir el enemigo
-    }
-}
-
-
-    // Matar al enemigo (sin animación ni sonido)
-    private void Die()
-    {
-        // Efecto de partículas (explosión, etc.)
-        efectoParticulas();
-
-        // Destruir al enemigo inmediatamente
-        Destroy(gameObject); // El enemigo se destruye inmediatamente
-
-        // Log de destrucción
-        Debug.Log("Enemigo destruido sin animación.");
-    }
-
-    // Efectos de partículas cuando muere
-    void efectoParticulas()
-    {
-        // Verifica si el VFX está asignado
-        if (efectoVFX != null)
-        {
-            // Instancia el efecto en la posición y rotación del enemigo
-            Instantiate(efectoVFX, transform.position, Quaternion.identity);
-        }
-        else
-        {
-            Debug.LogWarning("No se ha asignado un efecto de partículas en el campo 'efectoVFX'.");
-        }
-    }
-
-    public void ComportamientoEnemigo()
-    {
-        estarAlerta = Physics.CheckSphere(transform.position, rangoDeAlerta, capaDelJugador);
-
-        if (!estarAlerta)
-        {
-            atacar = false;
-            aniEnemigo.SetBool("run", false);
-            cronometro += Time.deltaTime;
-
-            if (cronometro >= 4)
+            if (distancia <= rangoAtaque)
             {
-                rutina = Random.Range(0, 2);
-                cronometro = 0;
-            }
-
-            switch (rutina)
-            {
-                case 0:
-                    aniEnemigo.SetBool("walk", false);
-                    break;
-
-                case 1:
-                    transform.rotation = Quaternion.Euler(0, Random.Range(0, 360), 0);
-                    rutina++;
-                    break;
-
-                case 2:
-                    aniEnemigo.SetBool("walk", true);
-                    break;
-            }
-        }
-        else
-        {
-            Vector3 posJugador = new Vector3(jugador.position.x, transform.position.y, jugador.position.z);
-            transform.rotation = Quaternion.LookRotation(posJugador - transform.position);
-
-            atacar = Physics.CheckSphere(transform.position, rangoAtaque, capaDelJugador);
-
-            if (!atacar && !atacando)
-            {
-                aniEnemigo.SetBool("walk", false);
-                aniEnemigo.SetBool("run", true);
-                aniEnemigo.SetBool("attack", false);
-            }
-            else
-            {
+                // --- ESTÁ EN RANGO DE ATAQUE ---
+                // 1. Frenar
+                rb.velocity = Vector3.zero;
+                
+                // 2. Activar animación
                 aniEnemigo.SetBool("walk", false);
                 aniEnemigo.SetBool("run", false);
-            }
-        }
-    }
-
-    void MovimientoFisico()
-    {
-        if (atacando)
-        {
-            rb.velocity = Vector3.zero;
-            return;
-        }
-
-        if (!estarAlerta)
-        {
-            if (rutina == 2)
-            {
-                rb.velocity = transform.forward * velWalk;
+                aniEnemigo.SetBool("attack", true);
+                
+                // Nota: NO llamamos a hacer daño aquí. 
+                // Esperamos a que la Animación llame a 'InflicarDaño' mediante el Evento.
             }
             else
             {
-                rb.velocity = Vector3.zero;
-            }
-        }
-        else
-        {
-            if (!atacar)
-            {
+                // --- ESTÁ LEJOS: PERSEGUIR ---
+                aniEnemigo.SetBool("attack", false); 
+                aniEnemigo.SetBool("run", true);
+                aniEnemigo.SetBool("walk", false);
+                
+                // Moverse hacia el jugador
                 Vector3 dir = (jugador.position - transform.position).normalized;
-                dir.y = 0;
                 rb.velocity = dir * velRun;
             }
-            else
+        }
+        else
+        {
+            // --- IDLE (JUGADOR MUY LEJOS) ---
+            aniEnemigo.SetBool("run", false);
+            aniEnemigo.SetBool("attack", false);
+            rb.velocity = Vector3.zero;
+        }
+    }
+
+    // ---------------------------------------------------------
+    // ESTA FUNCIÓN SE EJECUTA SOLO CUANDO LA ANIMACIÓN LO ORDENA
+    // (Debes configurar el Evento en la ventana Animation)
+    // ---------------------------------------------------------
+    public void InflicarDaño()
+    {
+        // 1. Revisar si ya pasó el tiempo de espera (Cooldown)
+        if (Time.time < ultimoAtaqueTime + cooldownAtaque) return;
+
+        // 2. Revisar si el jugador sigue cerca (por si esquivó)
+        if (jugador == null) return;
+        
+        float distancia = Vector3.Distance(transform.position, jugador.position);
+        
+        // Damos un pequeño margen extra (0.5f) para que el golpe conecte si está casi en rango
+        if (distancia <= rangoAtaque + 0.5f) 
+        {
+            var pj = jugador.GetComponent<PersonajeController>();
+            if (pj != null)
             {
-                rb.velocity = Vector3.zero;
+                pj.TomarDaño(dañoAlJugador);
+                Debug.Log("¡GOLPE CONECTADO!");
+                
+                // Reiniciamos el reloj del cooldown
+                ultimoAtaqueTime = Time.time; 
             }
         }
     }
 
-    // Método que se llama cuando termina la animación de ataque
-    public void finAni()
+    // --- RECIBIR DAÑO Y MORIR ---
+    public void TakeDamage(int damage)
     {
-        aniEnemigo.SetBool("attack", false);
-        atacando = false;
-        rango.GetComponent<CapsuleCollider>().enabled = true;
+        vidas -= damage;
+        if (vidas <= 0) Die();
     }
 
-    // Este método será llamado desde el evento de la animación de ataque
-    public void InflicarDaño()
+    private void Die()
     {
-        Debug.Log("Evento ejecutado correctamente");
+        // Actualizar el GameController para la victoria
+        GameController.enemigosDerrotados++;
+        GameController.enemigosVivosActualmente--;
 
-        float distancia = Vector3.Distance(transform.position, jugador.position);
-        Debug.Log("Distancia:" + distancia);
-
-        if (distancia < 2.5f)
-        {
-            Debug.Log("Aplicando daño…");
-            jugador.GetComponent<PersonajeController>().TomarDaño(dañoAlJugador);
-        }
-        else
-        {
-            Debug.Log("Jugador fuera de rango");
-        }
+        // Efectos visuales
+        if (efectoVFX != null) 
+            Instantiate(efectoVFX, transform.position, Quaternion.identity);
+            
+        Destroy(gameObject);
     }
 }

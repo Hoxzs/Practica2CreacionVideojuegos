@@ -1,23 +1,12 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class MenuController : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    public void StartGame()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
-    public void escenaJuego()
-    {
-        SceneManager.LoadScene("Juego");
+        Debug.Log("Iniciando juego...");
+        // Usamos el nombre exacto. ¡Ojo con las mayúsculas!
+        SceneManager.LoadScene("Juego"); 
     }
 }
